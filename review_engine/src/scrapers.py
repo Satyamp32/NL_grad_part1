@@ -201,45 +201,64 @@ def load_seed_reddit() -> list:
     return []
 
 def scrape_all_and_save(play_limit=100, app_limit=100, reddit_limit=50):
-    """Orchestrates all scrapers, combines the data, and saves to raw_reviews.json."""
-    all_data = []
-    
+    """Orchestrates all scrapers, merges with existing data, and saves to raw_reviews.json.
+
+    IMPORTANT: This function MERGES new reviews with the existing corpus rather than
+    overwriting it. Deduplication is performed by review `id` so repeat syncs never
+    shrink the dataset.
+    """
+    newly_scraped = []
+
     # 1. Google Play Store
     play_data = scrape_google_play(play_limit)
-    all_data.extend(play_data)
-    
+    newly_scraped.extend(play_data)
+
     # 2. iOS App Store
     app_data = scrape_app_store(app_limit)
-    all_data.extend(app_data)
-    
+    newly_scraped.extend(app_data)
+
     # 3. Reddit
     reddit_data = scrape_reddit(reddit_limit)
-    all_data.extend(reddit_data)
-    
-    # Deduplicate by text content
-    df = pd.DataFrame(all_data)
-    if df.empty:
-        logger.warning("No reviews scraped from any source!")
-        # Seed mock reviews if everything is completely empty to ensure the pipeline can run
+    newly_scraped.extend(reddit_data)
+
+    # ── Load existing corpus to merge into ──────────────────────────────────
+    existing_data = []
+    if RAW_DATA_PATH.exists():
+        try:
+            with open(RAW_DATA_PATH, 'r') as f:
+                existing_data = json.load(f)
+            logger.info(f"Loaded {len(existing_data)} existing reviews from {RAW_DATA_PATH}")
+        except Exception as e:
+            logger.warning(f"Could not load existing raw reviews (will start fresh): {e}")
+
+    # ── Merge: existing first, then newly scraped ───────────────────────────
+    all_data = existing_data + newly_scraped
+
+    if not all_data:
+        logger.warning("No reviews available from any source!")
         all_data = load_seed_reddit()
-        df = pd.DataFrame(all_data)
-    
-    # Simple deduplication based on text cleanup
+
+    # ── Deduplicate by review id (primary), then by cleaned text (secondary) ─
+    df = pd.DataFrame(all_data)
+    df = df.drop_duplicates(subset=["id"])
     df["text_clean"] = df["text"].str.strip().str.lower()
     df = df.drop_duplicates(subset=["text_clean"])
     df = df.drop(columns=["text_clean"])
-    
+
     combined_data = df.to_dict(orient="records")
-    
-    # Save combined raw data
+
+    # ── Save merged corpus ──────────────────────────────────────────────────
     with open(RAW_DATA_PATH, 'w') as f:
         json.dump(combined_data, f, indent=2)
-        
-    logger.info(f"Finished scraping. Total unique reviews saved to {RAW_DATA_PATH}: {len(combined_data)}")
-    
-    # Output stats
+
+    new_count = len(combined_data) - len(existing_data)
+    logger.info(
+        f"Sync complete. Corpus: {len(combined_data)} total unique reviews "
+        f"(+{max(new_count, 0)} new) saved to {RAW_DATA_PATH}"
+    )
+
     stats = df["source"].value_counts().to_dict()
-    logger.info(f"Scraped distribution: {stats}")
+    logger.info(f"Source distribution: {stats}")
     return combined_data
 
 if __name__ == "__main__":
