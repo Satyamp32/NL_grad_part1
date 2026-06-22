@@ -912,16 +912,20 @@ with tab_opportunity:
     }
 
     fig_radar = go.Figure()
-    colors = ["#1DB954", "#60a5fa", "#c084fc"]
-    for (name, scores), color in zip(opp_scores.items(), colors):
+    radar_palette = [
+        {"line": "#1DB954", "fill": "rgba(29,185,84,0.15)"},
+        {"line": "#60a5fa", "fill": "rgba(96,165,250,0.15)"},
+        {"line": "#c084fc", "fill": "rgba(192,132,252,0.15)"},
+    ]
+    for (name, scores), palette in zip(opp_scores.items(), radar_palette):
         fig_radar.add_trace(go.Scatterpolar(
             r=scores + [scores[0]],
             theta=categories_radar + [categories_radar[0]],
             fill='toself',
             name=name,
-            line=dict(color=color, width=2),
-            fillcolor=color.replace("#", "rgba(").rstrip(")") + ",0.1)" if color.startswith("#") else color,
-            opacity=0.8
+            line=dict(color=palette["line"], width=2),
+            fillcolor=palette["fill"],
+            opacity=0.9
         ))
     fig_radar.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
