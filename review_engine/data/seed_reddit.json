@@ -1,0 +1,82 @@
+[
+  {
+    "id": "reddit_post_1",
+    "source": "Reddit",
+    "date": "2026-06-15",
+    "rating": 1,
+    "title": "Smart Shuffle is a joke, it plays the same 10 songs on repeat",
+    "text": "Is anyone else getting extremely frustrated with Spotify's Smart Shuffle? I have a playlist with over 800 songs. Every time I turn on Smart Shuffle, it injects 'recommended' tracks. But it's literally the same 10-15 songs every single day! I keep hitting skip, but Spotify refuses to take the hint. It feels like they are pushing sponsored tracks or songs that are cheap for them to stream. The algorithm is completely broken and repetitive."
+  },
+  {
+    "id": "reddit_post_2",
+    "source": "Reddit",
+    "date": "2026-06-14",
+    "rating": 2,
+    "title": "One focus session ruined my entire Discover Weekly",
+    "text": "I listened to a 4-hour 'Deep Focus Lofi' playlist last week while studying for an exam. Now, my Discover Weekly is 90% lofi beats. I don't want to listen to lofi in my normal life! Why does Spotify's algorithm weight a single focus session so heavily? It has completely contaminated my music profile. There should be a private listening session that doesn't affect my recommendations, or a way to manually remove genres from my taste profile."
+  },
+  {
+    "id": "reddit_post_3",
+    "source": "Reddit",
+    "date": "2026-06-12",
+    "rating": 2,
+    "title": "Spotify DJ is just a repeater",
+    "text": "The AI DJ started off cool, but now it's just repeating itself. Every single day it goes: 'Let's take a look back at what you were listening to in 2022' or 'Here is your daily dose of your favorite genre, Indie Pop.' It rarely introduces me to new artists. When it does try to play 'something new,' it's always high-profile pop songs that I already know. Where is the actual discovery? I feel like I'm stuck in a feedback loop."
+  },
+  {
+    "id": "reddit_post_4",
+    "source": "Reddit",
+    "date": "2026-06-10",
+    "rating": 1,
+    "title": "Why does Spotify radio just play my liked songs?",
+    "text": "If I start a 'Song Radio' based on an obscure synthwave track, the first 5 songs are synthwave, but then the next 15 are songs from my 'Liked Songs' that have absolutely nothing to do with the original vibe. It's like the algorithm gets lazy and falls back to what it knows I like. I start radio to find *new* music, not to listen to the same Tame Impala songs for the thousandth time. This is lazy engineering."
+  },
+  {
+    "id": "reddit_post_5",
+    "source": "Reddit",
+    "date": "2026-06-08",
+    "rating": 3,
+    "title": "No way to discover music by complex moods",
+    "text": "I want to find music that feels like 'driving in the rain in a cyberpunk city' or 'nostalgic autumn afternoon'. If I search these terms, I just get user-created playlists with questionable curation, or generic mood hubs from Spotify (e.g. 'Chill', 'Sad'). The recommendation engine has no understanding of context, mood, or lyrics. It only matches acoustic features and user co-occurrence. We need an AI that actually understands descriptions."
+  },
+  {
+    "id": "reddit_comment_6",
+    "source": "Reddit",
+    "date": "2026-06-07",
+    "rating": 2,
+    "title": "Comment on: Recommendations are getting worse?",
+    "text": "Totally agree. I feel like Spotify is actively discouraging discovery to save on royalty costs. Playing independent long-tail music might cost them more or they want to push major label content. I keep getting recommended the same mainstream tracks even though I listen to very niche subgenres. Collaborative filtering just creates a massive echo chamber where everyone is pushed to the center."
+  },
+  {
+    "id": "reddit_post_7",
+    "source": "Reddit",
+    "date": "2026-06-05",
+    "rating": 2,
+    "title": "We need a 'Don't Recommend This Artist' button",
+    "text": "Why is there no block button for artists or genres? There are certain artists I absolutely detest, yet Spotify keeps inserting them into my Release Radar and Discover Weekly. If I skip a song within 2 seconds, that should be a strong signal to never play it again. Instead, it plays it again tomorrow on a different playlist. We need direct controls over our recommendation profile, not just a passive thumbs up/down."
+  },
+  {
+    "id": "reddit_post_8",
+    "source": "Reddit",
+    "date": "2026-06-03",
+    "rating": 3,
+    "title": "Discovery is too much work",
+    "text": "As I've gotten older, I don't have hours to spend digging through music blogs or clicking through obscure albums. I want Spotify to do the heavy lifting, but their automated playlists are boring. Daily Mixes are just songs I already know, and Discover Weekly is a hit-or-miss. It feels like there is no middle ground between active digging (which is exhausting) and passive listening (which is repetitive)."
+  },
+  {
+    "id": "reddit_comment_9",
+    "source": "Reddit",
+    "date": "2026-06-01",
+    "rating": 1,
+    "title": "Comment on: Shuffle algorithm is broken",
+    "text": "It definitely is not random. It is optimized to keep you on the app, which apparently means playing your top 5% most listened songs over and over. I have a 2000-song playlist and I swear I hear the same 100 songs. It's frustrating because I want to rediscover songs I saved 5 years ago, but the algorithm hides them in favor of my recent habits. I want a true random shuffle, or a shuffle that prioritizes 'least played' tracks."
+  },
+  {
+    "id": "reddit_post_10",
+    "source": "Reddit",
+    "date": "2026-05-28",
+    "rating": 2,
+    "title": "Shared account or family plan recommendations are a mess",
+    "text": "My kid uses my Spotify account in the car, and now my recommendations are a blend of heavy metal and Cocomelon. Spotify's recommendation engine has zero awareness of multi-user profiles or contextual situations (like car vs. gym vs. home). The AI should easily be able to tell that nursery rhymes are a separate context and shouldn't bleed into my metal discover playlist."
+  }
+]
