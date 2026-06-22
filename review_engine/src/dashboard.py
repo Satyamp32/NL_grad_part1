@@ -1,9 +1,16 @@
 import json
+import sys
 from pathlib import Path
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+
+# Ensure the project root (two levels above this file) is always on sys.path
+# so that `review_engine` is importable whether running locally or on Streamlit Cloud.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Page Configuration
@@ -419,13 +426,20 @@ st.sidebar.markdown("### 🔄 Data Sync")
 if st.sidebar.button("Sync Feedback Data", help="Scrapes latest reviews and re-runs classification"):
     status_text = st.sidebar.empty()
     try:
+        # Re-assert sys.path inside the callback to be safe on Streamlit Cloud
+        _root = Path(__file__).resolve().parent.parent.parent
+        if str(_root) not in sys.path:
+            sys.path.insert(0, str(_root))
+
         status_text.info("📡 Scraping Play Store & App Store...")
-        from review_engine.src.scrapers import scrape_all_and_save
+        from review_engine.src.scrapers import scrape_all_and_save  # noqa: PLC0415
         scrape_all_and_save(play_limit=100, app_limit=100, reddit_limit=10)
+
         status_text.info("🧠 Running sentiment & thematic analysis...")
-        from review_engine.src.analyzer import run_classification, generate_synthesis_report
+        from review_engine.src.analyzer import run_classification, generate_synthesis_report  # noqa: PLC0415
         analyzed = run_classification()
         generate_synthesis_report(analyzed)
+
         status_text.success("✅ Sync complete!")
         st.cache_data.clear()
         st.rerun()
