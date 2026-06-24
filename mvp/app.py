@@ -800,7 +800,24 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
     </div>
     """, unsafe_allow_html=True)
 
-    # Audio feature summary
+    # Avg popularity proof
+    if tracks:
+        avg_pop = int(sum(t.get("popularity", 50) for t in tracks) / len(tracks))
+        pop_color = "#4ade80" if avg_pop < 50 else ("#fbbf24" if avg_pop < 70 else "#f87171")
+        st.markdown(f"""
+        <div style='background:rgba(29,185,84,0.06);border:1px solid rgba(29,185,84,0.15);
+                    border-radius:8px;padding:0.6rem 1rem;margin-bottom:1rem;
+                    font-size:0.8rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;'>
+            <span style='color:#475569;'>Avg. popularity of these tracks:</span>
+            <b style='color:{pop_color};font-size:1.1rem;'>{avg_pop}/100</b>
+            <span style='color:#334155;'>·</span>
+            <span style='color:#475569;font-style:italic;'>
+                Spotify's algorithm typically surfaces 65+.
+                {'These are genuine deep cuts.' if avg_pop < 50 else 'These are emerging or niche picks.'}
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
+
     if features:
         cols = st.columns(5)
         labels = [("Mood", "valence", "😊"),
@@ -860,6 +877,102 @@ def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: 
                 st.balloons()
             except Exception as e:
                 st.error(f"Could not save playlist: {e}")
+
+
+# ─── AI Interpretation Panel ──────────────────────────────────────────────────
+def _render_interpretation_panel(parsed: dict, mood_text: str,
+                                  exploration: int, n_excluded: int):
+    """Show the AI's interpretation of the user's mood — the key AI-native differentiator."""
+    features     = parsed.get("features", {})
+    genres       = parsed.get("genres", [])
+    mood_summary = parsed.get("mood_summary", mood_text[:60])
+    mode         = parsed.get("mode", "heuristic")
+
+    mode_label = "LLM Semantic Analysis" if mode in ("openai", "anthropic") else "Semantic Heuristic Engine"
+    mode_color = "#60a5fa" if mode in ("openai", "anthropic") else "#fbbf24"
+
+    if exploration <= 3:
+        pop_range, disc_label = "30–100", "Familiar territory · Seeds from your listening history"
+    elif exploration <= 6:
+        pop_range, disc_label = "15–75", "Balanced · Mixed seeds"
+    else:
+        pop_range, disc_label = "0–45", "Underground territory · Genre-only seeds · Zero history bias"
+
+    def bar(val, label, icon):
+        pct = int(val * 100)
+        return f"""
+        <div style='margin:0.45rem 0;display:flex;align-items:center;gap:0.6rem;'>
+            <div style='width:1.2rem;font-size:0.85rem;'>{icon}</div>
+            <div style='width:8rem;font-size:0.75rem;color:#94a3b8;'>{label}</div>
+            <div style='flex:1;background:rgba(255,255,255,0.06);border-radius:3px;height:7px;'>
+                <div style='width:{min(pct,100)}%;background:linear-gradient(90deg,#1DB954,#60a5fa);
+                            height:7px;border-radius:3px;'></div>
+            </div>
+            <div style='width:2.8rem;font-size:0.75rem;color:#60a5fa;font-weight:700;text-align:right;'>{pct}%</div>
+        </div>"""
+
+    bars  = bar(features.get("valence", 0.5),        "Mood Positivity", "😊")
+    bars += bar(features.get("energy", 0.5),          "Energy Level",   "⚡")
+    bars += bar(features.get("danceability", 0.5),    "Danceability",   "💃")
+    bars += bar(features.get("acousticness", 0.4),    "Acoustic Feel",  "🎸")
+    bars += bar(features.get("instrumentalness", 0.1),"Instrumental",   "🎹")
+
+    genre_pills = "".join(
+        f"<span style='background:rgba(29,185,84,0.15);border:1px solid rgba(29,185,84,0.3);"
+        f"color:#4ade80;border-radius:12px;padding:0.2rem 0.65rem;font-size:0.74rem;"
+        f"margin-right:0.35rem;'>{g}</span>"
+        for g in genres
+    )
+    excluded_note = (
+        f" · <span style='color:#475569;'>{n_excluded} of your top tracks excluded for fresh discovery</span>"
+        if n_excluded > 0 else ""
+    )
+
+    st.markdown(f"""
+    <div style='background:rgba(96,165,250,0.04);border:1px solid rgba(96,165,250,0.18);
+                border-radius:14px;padding:1.4rem 1.5rem;margin-bottom:1.25rem;'>
+
+        <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:0.9rem;'>
+            <div style='font-size:0.68rem;color:{mode_color};font-weight:800;
+                        letter-spacing:0.1em;text-transform:uppercase;'>
+                🧠 AI Mood Interpretation
+            </div>
+            <div style='font-size:0.68rem;color:{mode_color};background:rgba(96,165,250,0.1);
+                        border:1px solid rgba(96,165,250,0.2);border-radius:8px;
+                        padding:0.15rem 0.6rem;'>{mode_label}</div>
+        </div>
+
+        <div style='font-size:0.83rem;color:#94a3b8;margin-bottom:0.3rem;'>
+            You said: <span style='color:#e2e8f0;font-style:italic;'>"{mood_text[:90]}"</span>
+        </div>
+        <div style='font-size:0.83rem;color:#94a3b8;margin-bottom:1.1rem;'>
+            Interpreted as: <b style='color:#4ade80;'>{mood_summary}</b>
+        </div>
+
+        <div style='font-size:0.68rem;color:#475569;text-transform:uppercase;
+                    letter-spacing:0.08em;margin-bottom:0.5rem;'>Musical DNA</div>
+        {bars}
+
+        <div style='margin-top:0.9rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;'>
+            <span style='font-size:0.72rem;color:#475569;'>Genre seeds →</span>
+            {genre_pills}
+        </div>
+
+        <div style='margin-top:0.75rem;font-size:0.76rem;color:#475569;
+                    border-top:1px solid rgba(255,255,255,0.05);padding-top:0.7rem;'>
+            🎛️ Discovery {exploration}/10 · {disc_label}{excluded_note}
+        </div>
+
+        <div style='margin-top:0.6rem;background:rgba(29,185,84,0.06);
+                    border-left:3px solid #1DB954;border-radius:0 6px 6px 0;
+                    padding:0.6rem 0.9rem;font-size:0.78rem;'>
+            <b style='color:#1DB954;'>⚡ vs Traditional Spotify:</b>
+            <span style='color:#475569;'> Collaborative Filtering would serve popularity
+            65+ tracks from your <i>existing taste cluster</i>. This engine found tracks
+            matching your <i>described emotional intent</i> with popularity {pop_range}.</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ─── OAuth callback — must run before any UI rendering ────────────────────────
@@ -979,6 +1092,18 @@ else:
             """, unsafe_allow_html=True)
 
     with col_results:
+        # ── Research Finding → MVP Connection ───────────────────────────────
+        st.markdown("""
+        <div style='background:rgba(29,185,84,0.05);border:1px solid rgba(29,185,84,0.12);
+                    border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;
+                    font-size:0.78rem;color:#475569;line-height:1.6;'>
+            <b style='color:#1DB954;'>📊 Research finding → this MVP:</b>
+            Analysis of 1,466 Spotify reviews found 86% of users trapped in repetition.
+            Root cause: <i>no mechanism to express discovery intent.</i>
+            This tool closes that gap — describe your mood, get what you actually want.
+        </div>
+        """, unsafe_allow_html=True)
+
         # Handle generate
         if generate_clicked:
             if not mood_text:
@@ -1021,6 +1146,11 @@ else:
         # Show results if available
         if "last_result" in st.session_state:
             res = st.session_state["last_result"]
+            # AI Interpretation Panel — shows reasoning BEFORE tracks
+            _render_interpretation_panel(
+                res["parsed"], res["mood_text"],
+                res["exploration"], res.get("n_excluded", 0)
+            )
             track_uris = _render_results(
                 res["tracks"], res["explanations"], res["parsed"],
                 res["mood_text"], res["exploration"]

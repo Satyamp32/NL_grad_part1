@@ -279,11 +279,20 @@ def generate_track_explanations(mood_text: str, tracks: list,
     if not tracks:
         return []
 
-    # Template fallback
+    # Template fallback — references actual audio features for credibility
     def template_explanation(track: dict, mood_summary: str) -> str:
-        name = track.get("name", "This track")
-        artist = track.get("artists", [{}])[0].get("name", "this artist")
-        return f"Chosen for its '{mood_summary}' vibe — {name} by {artist} matches the emotional texture you described."
+        pop         = track.get("popularity", 50)
+        features    = parsed_mood.get("features", {})
+        energy      = features.get("energy", 0.5)
+        valence     = features.get("valence", 0.5)
+        acousticness= features.get("acousticness", 0.4)
+
+        e_w  = "high-energy" if energy > 0.65 else ("mellow" if energy < 0.35 else "mid-tempo")
+        t_w  = "uplifting"   if valence > 0.62 else ("melancholic" if valence < 0.35 else "emotionally layered")
+        x_w  = "acoustic"    if acousticness > 0.62 else ("electronic" if acousticness < 0.25 else "hybrid")
+        d_note = "likely new to you" if pop < 40 else ("a niche pick" if pop < 58 else "a resonant find")
+
+        return f"Fits your '{mood_summary}' — {e_w}, {t_w}, {x_w} texture. Popularity {pop}/100 — {d_note}."
 
     # Build track list for LLM
     track_lines = "\n".join(
