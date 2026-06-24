@@ -986,48 +986,33 @@ def _render_track_card(track: dict, explanation: str, index: int):
     # Safe album resolution
     album_obj = track.get("album")
     album = ""
-    images = []
     if album_obj and isinstance(album_obj, dict):
         album = album_obj.get("name", "")
-        images = album_obj.get("images", [])
         
     duration = track.get("duration_ms")
     duration = (duration // 1000) if duration is not None else 0
     mins, secs = divmod(duration, 60)
     
-    img_url = None
-    if images and isinstance(images, list):
-        last_image = images[-1]
-        if isinstance(last_image, dict):
-            img_url = last_image.get("url")
-            
     pop = track.get("popularity")
     pop = pop if pop is not None else 50
     
     ext_urls = track.get("external_urls")
     sp_url = ext_urls.get("spotify", "#") if ext_urls and isinstance(ext_urls, dict) else "#"
 
-    col_img, col_info = st.columns([1, 6])
-    with col_img:
-        if img_url:
-            st.image(img_url, width=64)
-        else:
-            st.markdown(f"<div style='width:64px;height:64px;background:rgba(29,185,84,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;'>🎵</div>", unsafe_allow_html=True)
-    with col_info:
-        st.markdown(f"""
-        <div>
-            <div class='track-name'>
-                <a href='{sp_url}' target='_blank' style='color:#f1f5f9;text-decoration:none;'>
-                    {index}. {name}
-                </a>
-            </div>
-            <div class='track-artist'>{artist} · {album} · {mins}:{secs:02d}</div>
-            <div style='margin-top:0.15rem;'>
-                <span style='font-size:0.7rem;color:#334155;'>Popularity: {pop}/100</span>
-            </div>
-            <div class='track-explanation'>"{explanation}"</div>
+    st.markdown(f"""
+    <div>
+        <div class='track-name'>
+            <a href='{sp_url}' target='_blank' style='color:#f1f5f9;text-decoration:none;'>
+                {index}. {name}
+            </a>
         </div>
-        """, unsafe_allow_html=True)
+        <div class='track-artist'>{artist} · {album} · {mins}:{secs:02d}</div>
+        <div style='margin-top:0.15rem;'>
+            <span style='font-size:0.7rem;color:#334155;'>Popularity: {pop}/100</span>
+        </div>
+        <div class='track-explanation'>"{explanation}"</div>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
 
 
