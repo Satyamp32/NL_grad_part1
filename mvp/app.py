@@ -386,9 +386,78 @@ def _fetch_top_items(token: str) -> dict:
     top_artists = sp.current_user_top_artists(limit=10, time_range="medium_term")
     return {"tracks": top_tracks.get("items", []), "artists": top_artists.get("items", [])}
 
+def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: int) -> list:
+    """Fallback search-based discovery when Spotify recommendations endpoint is deprecated/blocked."""
+    import re
+    import random
+    
+    genres = parsed.get("genres", [])
+    mood_summary = parsed.get("mood_summary", "")
+    clean_mood = re.sub(r'[^\w\s]', '', mood_summary).strip()
+    
+    # Generate search queries
+    queries = []
+    # 1. Combined genre + mood keyword queries (highest relevance)
+    for g in genres:
+        if clean_mood:
+            queries.append(f"genre:{g} {clean_mood}")
+        else:
+            queries.append(f"genre:{g}")
+            
+    # 2. General mood keyword query
+    if clean_mood:
+        queries.append(clean_mood)
+        
+    # 3. Simple genre queries
+    for g in genres:
+        queries.append(f"genre:{g}")
+        
+    # De-duplicate queries list
+    queries = list(dict.fromkeys(queries))
+    
+    pool = {}
+    
+    # Fetch tracks from each query
+    for q in queries[:5]: # limit to top 5 queries to avoid rate limits
+        try:
+            # We search for up to 30 tracks per query to build a diverse pool
+            results = sp.search(q=q, type="track", limit=30)
+            if results and "tracks" in results and "items" in results["tracks"]:
+                for track in results["tracks"]["items"]:
+                    if track and "id" in track:
+                        pool[track["id"]] = track
+        except Exception as e:
+            # Silently ignore search errors for individual queries
+            pass
+            
+    tracks_pool = list(pool.values())
+    if not tracks_pool:
+        return []
+        
+    # Apply popularity filter matching the Discovery Dial (exploration_level 1-10)
+    if exploration_level <= 3:
+        # Familiar mode: target mainstream/known hits
+        filtered = [t for t in tracks_pool if 30 <= t.get("popularity", 50) <= 100]
+        filtered.sort(key=lambda t: t.get("popularity", 50), reverse=True)
+    elif exploration_level <= 6:
+        # Balanced mode: mix of mainstream and indie
+        filtered = [t for t in tracks_pool if 15 <= t.get("popularity", 50) <= 75]
+        random.shuffle(filtered)
+    else:
+        # Explorer mode: underground deep cuts
+        filtered = [t for t in tracks_pool if t.get("popularity", 50) <= 45]
+        filtered.sort(key=lambda t: t.get("popularity", 50))
+        
+    # Fallback to the whole pool if the filtering was too strict
+    if not filtered:
+        filtered = tracks_pool
+        random.shuffle(filtered)
+        
+    return filtered[:15]
+
 def _build_recommendations(token: str, parsed: dict, exploration_level: int,
                             top_artist_ids: list) -> list:
-    """Call Spotify recommendations API with audio features from LLM."""
+    """Call Spotify recommendations API with audio features from LLM, or fallback to Search API if blocked."""
     sp = _get_sp(token)
     features = parsed["features"]
     genres   = parsed["genres"]
@@ -431,11 +500,8 @@ def _build_recommendations(token: str, parsed: dict, exploration_level: int,
         result = sp.recommendations(**kwargs)
         return result.get("tracks", [])
     except Exception as e:
-        st.warning(f"Spotify API error: {e}. Retrying without artist seeds…")
-        kwargs.pop("seed_artists", None)
-        kwargs["seed_genres"] = genres[:3] if genres else ["indie"]
-        result = sp.recommendations(**kwargs)
-        return result.get("tracks", [])
+        # Fall back to search-based discovery if restricted (404/403)
+        return _build_recommendations_search_fallback(sp, parsed, exploration_level)
 
 def _save_playlist(token: str, user_id: str, name: str,
                    track_uris: list, description: str = "") -> str:
