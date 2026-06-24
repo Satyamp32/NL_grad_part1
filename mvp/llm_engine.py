@@ -64,6 +64,10 @@ MOOD_FEATURES: dict[str, dict] = {
     "sunset":     {"valence": 0.65, "energy": 0.42, "danceability": 0.50, "acousticness": 0.52, "instrumentalness": 0.28},
     "melancholic":{"valence": 0.22, "energy": 0.30, "danceability": 0.28, "acousticness": 0.64, "instrumentalness": 0.28},
     "bittersweet":{"valence": 0.40, "energy": 0.38, "danceability": 0.38, "acousticness": 0.55, "instrumentalness": 0.22},
+    "bollywood":  {"valence": 0.68, "energy": 0.65, "danceability": 0.68, "acousticness": 0.38, "instrumentalness": 0.02},
+    "hindi":      {"valence": 0.60, "energy": 0.58, "danceability": 0.60, "acousticness": 0.42, "instrumentalness": 0.02},
+    "punjabi":    {"valence": 0.80, "energy": 0.84, "danceability": 0.82, "acousticness": 0.12, "instrumentalness": 0.01},
+    "indian":     {"valence": 0.62, "energy": 0.60, "danceability": 0.62, "acousticness": 0.40, "instrumentalness": 0.03},
 }
 
 MOOD_GENRES: dict[str, list] = {
@@ -108,6 +112,10 @@ MOOD_GENRES: dict[str, list] = {
     "sunset":     ["indie", "ambient", "chillout"],
     "melancholic":["indie", "alternative", "folk"],
     "bittersweet":["indie", "alternative", "singer-songwriter"],
+    "bollywood":  ["bollywood", "hindi", "pop"],
+    "hindi":      ["hindi", "bollywood", "pop"],
+    "punjabi":    ["punjabi", "bollywood", "dance"],
+    "indian":     ["hindi", "bollywood", "indian"],
 }
 
 _DEFAULTS = {
@@ -134,7 +142,22 @@ def _heuristic_parse(mood_text: str, exploration_level: int) -> dict:
             matched_genres.extend(genres)
 
     if not matched_features:
-        avg_features = _DEFAULTS["features"].copy()
+        import hashlib
+        # Generate a deterministic offset based on the mood text hash
+        h = int(hashlib.md5(mood_text.encode('utf-8')).hexdigest(), 16)
+        
+        # Helper to generate a stable pseudo-random value between min_val and max_val centered around default_val
+        def offset_val(idx, default_val, min_val=0.1, max_val=0.9):
+            val = default_val + (((h >> (idx * 8)) & 0xFF) / 255.0 * 0.5 - 0.25)
+            return round(max(min_val, min(max_val, val)), 3)
+            
+        avg_features = {
+            "valence": offset_val(0, 0.5),
+            "energy": offset_val(1, 0.5),
+            "danceability": offset_val(2, 0.5),
+            "acousticness": offset_val(3, 0.4),
+            "instrumentalness": offset_val(4, 0.1, min_val=0.01, max_val=0.4),
+        }
     else:
         avg_features = {}
         for key in _DEFAULTS["features"]:
