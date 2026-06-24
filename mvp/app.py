@@ -1034,6 +1034,7 @@ def _render_track_card(track: dict, explanation: str, index: int):
 def _render_results(tracks: list, explanations: list, parsed_mood: dict,
                     mood_text: str, exploration: int):
     """Render the full results section."""
+    import textwrap
     mood_summary = parsed_mood.get("mood_summary", mood_text[:60])
     mode         = parsed_mood.get("mode", "heuristic")
     features     = parsed_mood.get("features", {})
@@ -1044,7 +1045,7 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
         else "<span class='mode-badge-heuristic'>📐 Heuristic Mode</span>"
     )
 
-    st.markdown(f"""
+    header_html = textwrap.dedent(f"""
     <div style='margin-bottom:1.5rem;'>
         <div class='section-label'>Discovery Results</div>
         <div class='section-title'>Your "{mood_summary}" Playlist</div>
@@ -1052,11 +1053,15 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
             {len(tracks)} tracks · Exploration level {exploration}/10 · {mode_badge}
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+    try:
+        st.html(header_html)
+    except AttributeError:
+        st.markdown(header_html, unsafe_allow_html=True)
 
     # Avg popularity proof
     if tracks:
-        avg_pop = int(sum((t.get("popularity") if t.get("popularity") is not None else 50) for t in tracks) / len(tracks))
+        avg_pop = int(sum((t.get("popularity") if (t and isinstance(t, dict) and t.get("popularity") is not None) else 50) for t in tracks) / len(tracks))
         pop_color = "#4ade80" if avg_pop < 50 else ("#fbbf24" if avg_pop < 70 else "#f87171")
         st.markdown(f"""
         <div style='background:rgba(29,185,84,0.06);border:1px solid rgba(29,185,84,0.15);
@@ -1104,12 +1109,13 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
 
 def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: str):
     """Render the save-to-Spotify button and handle saving."""
+    import textwrap
     st.markdown("<br>", unsafe_allow_html=True)
     
     is_demo = (token == "demo_token")
     
     if is_demo:
-        st.markdown("""
+        save_html = textwrap.dedent("""
         <div class='glass-card' style='text-align:center; padding:2rem;'>
             <div style='font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;'>
                 💾 Save to Your Spotify (Demo Mode)
@@ -1118,9 +1124,9 @@ def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: 
                 In Demo Mode, playlist saving is simulated. Under Spotify's developer policy, only Premium accounts can create real playlists.
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """).strip()
     else:
-        st.markdown("""
+        save_html = textwrap.dedent("""
         <div class='glass-card' style='text-align:center; padding:2rem;'>
             <div style='font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;'>
                 💾 Save to Your Spotify
@@ -1129,7 +1135,12 @@ def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: 
                 Creates a private playlist in your Spotify account with these {n} tracks.
             </div>
         </div>
-        """.replace("{n}", str(len(track_uris))), unsafe_allow_html=True)
+        """).replace("{n}", str(len(track_uris))).strip()
+
+    try:
+        st.html(save_html)
+    except AttributeError:
+        st.markdown(save_html, unsafe_allow_html=True)
 
     playlist_name = st.text_input(
         "Playlist name",
@@ -1199,7 +1210,8 @@ def _render_interpretation_panel(parsed: dict, mood_text: str,
         if n_excluded > 0 else ""
     )
 
-    st.markdown(f"""
+    import textwrap
+    html_code = textwrap.dedent(f"""
     <div style='background:rgba(96,165,250,0.04);border:1px solid rgba(96,165,250,0.18);
                 border-radius:14px;padding:1.4rem 1.5rem;margin-bottom:1.25rem;'>
 
@@ -1243,7 +1255,12 @@ def _render_interpretation_panel(parsed: dict, mood_text: str,
             matching your <i>described emotional intent</i> with popularity {pop_range}.</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+
+    try:
+        st.html(html_code)
+    except AttributeError:
+        st.markdown(html_code, unsafe_allow_html=True)
 
 
 # ─── OAuth callback — must run before any UI rendering ────────────────────────
