@@ -341,6 +341,8 @@ def _get_valid_token() -> str | None:
     if "token_info" not in st.session_state:
         return None
     token_info = st.session_state["token_info"]
+    if token_info.get("access_token") == "demo_token":
+        return "demo_token"
     sp_oauth = _get_sp_oauth()
     if not sp_oauth:
         return None
@@ -355,16 +357,30 @@ def _get_valid_token() -> str | None:
 
 def _get_sp(token: str):
     import spotipy
+    if token == "demo_token":
+        from spotipy.oauth2 import SpotifyClientCredentials
+        return spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
+            client_id=SPOTIFY_CLIENT_ID,
+            client_secret=SPOTIFY_CLIENT_SECRET
+        ))
     return spotipy.Spotify(auth=token)
 
 # ─── Spotify API calls ────────────────────────────────────────────────────────
 @st.cache_data(ttl=600)
 def _fetch_user_profile(token: str) -> dict:
+    if token == "demo_token":
+        return {
+            "id": "demo_evaluator",
+            "display_name": "Demo Guest",
+            "images": [{"url": "https://api.dicebear.com/7.x/bottts/svg?seed=Demo"}]
+        }
     sp = _get_sp(token)
     return sp.current_user()
 
 @st.cache_data(ttl=600)
 def _fetch_top_items(token: str) -> dict:
+    if token == "demo_token":
+        return {"tracks": [], "artists": []}
     sp = _get_sp(token)
     top_tracks  = sp.current_user_top_tracks(limit=20, time_range="medium_term")
     top_artists = sp.current_user_top_artists(limit=10, time_range="medium_term")
@@ -424,6 +440,10 @@ def _build_recommendations(token: str, parsed: dict, exploration_level: int,
 def _save_playlist(token: str, user_id: str, name: str,
                    track_uris: list, description: str = "") -> str:
     """Create a new Spotify playlist and add tracks. Returns playlist URL."""
+    if token == "demo_token":
+        import time
+        time.sleep(1.0)
+        return "https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO"
     sp = _get_sp(token)
     playlist = sp.user_playlist_create(
         user=user_id,
@@ -512,14 +532,25 @@ def _render_landing():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div style='text-align:center; margin-top:2rem;'>", unsafe_allow_html=True)
     if _CREDENTIALS_READY:
         sp_oauth = _get_sp_oauth()
         auth_url = sp_oauth.get_authorize_url()
-        st.link_button("🎵  Connect with Spotify", auth_url, use_container_width=False)
+        
+        c1, c2, c3 = st.columns([1, 2, 1])
+        with c2:
+            st.link_button("🎵  Connect with Spotify", auth_url, use_container_width=True)
+            st.markdown("<div style='text-align:center; margin: 0.5rem 0; color:#64748b; font-size:0.85rem;'>— or —</div>", unsafe_allow_html=True)
+            if st.button("🚀  Try Sandbox Demo Mode", use_container_width=True):
+                st.session_state["token_info"] = {
+                    "access_token": "demo_token",
+                    "expires_at": 9999999999
+                }
+                st.rerun()
+            st.markdown("<div style='text-align:center; color:#64748b; font-size:0.75rem; margin-top:0.3rem;'>No Premium subscription or login required</div>", unsafe_allow_html=True)
     else:
+        st.markdown("<div style='text-align:center; margin-top:2rem;'>", unsafe_allow_html=True)
         _render_setup_warning()
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # How it works
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -634,10 +665,32 @@ def _render_landing():
 def _render_user_profile(user: dict, top_items: dict):
     """Display user's current musical comfort zone."""
     display_name = user.get("display_name", "Listener")
-    top_artists  = top_items["tracks"][:3]
-    artist_names = [t["artists"][0]["name"] for t in top_items["tracks"][:5]]
+    
+    tracks = top_items.get("tracks", [])
+    artists = top_items.get("artists", [])
+    
+    # Populate mock data for demo mode to make the dashboard look populated
+    if not tracks:
+        tracks = [
+            {"id": "mock_t1", "name": "Breathe", "artists": [{"name": "Pink Floyd"}]},
+            {"id": "mock_t2", "name": "Fake Plastic Trees", "artists": [{"name": "Radiohead"}]},
+            {"id": "mock_t3", "name": "Lost in the Dream", "artists": [{"name": "The War on Drugs"}]},
+            {"id": "mock_t4", "name": "Intro", "artists": [{"name": "The xx"}]},
+            {"id": "mock_t5", "name": "Holocene", "artists": [{"name": "Bon Iver"}]}
+        ]
+    if not artists:
+        artists = [
+            {"id": "mock_a1", "name": "Pink Floyd", "genres": ["classic rock", "psychedelic rock"]},
+            {"id": "mock_a2", "name": "Radiohead", "genres": ["alternative rock", "art rock"]},
+            {"id": "mock_a3", "name": "The War on Drugs", "genres": ["indie rock", "dream pop"]},
+            {"id": "mock_a4", "name": "The xx", "genres": ["indie pop", "downtempo"]},
+            {"id": "mock_a5", "name": "Bon Iver", "genres": ["indie folk", "singer-songwriter"]}
+        ]
+        
+    top_artists  = tracks[:3]
+    artist_names = [t["artists"][0]["name"] for t in tracks[:5]]
     top_genres   = []
-    for a in top_items["artists"][:5]:
+    for a in artists[:5]:
         top_genres.extend(a.get("genres", [])[:2])
     top_genres = list(dict.fromkeys(top_genres))[:4]
 
@@ -851,16 +904,31 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
 def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: str):
     """Render the save-to-Spotify button and handle saving."""
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class='glass-card' style='text-align:center; padding:2rem;'>
-        <div style='font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;'>
-            💾 Save to Your Spotify
+    
+    is_demo = (token == "demo_token")
+    
+    if is_demo:
+        st.markdown("""
+        <div class='glass-card' style='text-align:center; padding:2rem;'>
+            <div style='font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;'>
+                💾 Save to Your Spotify (Demo Mode)
+            </div>
+            <div style='color:#64748b;font-size:0.88rem;margin-bottom:1.5rem;'>
+                In Demo Mode, playlist saving is simulated. Under Spotify's developer policy, only Premium accounts can create real playlists.
+            </div>
         </div>
-        <div style='color:#64748b;font-size:0.88rem;margin-bottom:1.5rem;'>
-            Creates a private playlist in your Spotify account with these {n} tracks.
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class='glass-card' style='text-align:center; padding:2rem;'>
+            <div style='font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;'>
+                💾 Save to Your Spotify
+            </div>
+            <div style='color:#64748b;font-size:0.88rem;margin-bottom:1.5rem;'>
+                Creates a private playlist in your Spotify account with these {n} tracks.
+            </div>
         </div>
-    </div>
-    """.replace("{n}", str(len(track_uris))), unsafe_allow_html=True)
+        """.replace("{n}", str(len(track_uris))), unsafe_allow_html=True)
 
     playlist_name = st.text_input(
         "Playlist name",
@@ -873,6 +941,8 @@ def _render_save_section(track_uris: list, mood_text: str, token: str, user_id: 
             try:
                 url = _save_playlist(token, user_id, playlist_name, track_uris,
                                      f"AI-curated for: {mood_text[:100]}")
+                if is_demo:
+                    st.info("ℹ️ Demo Mode: Simulated playlist creation successful!")
                 st.success(f"✅ Playlist saved! [Open in Spotify →]({url})")
                 st.balloons()
             except Exception as e:
@@ -985,6 +1055,7 @@ if not token:
     _render_landing()
 else:
     # ── Authenticated experience ──────────────────────────────────────────
+    is_demo = (token == "demo_token")
     try:
         user      = _fetch_user_profile(token)
         top_items = _fetch_top_items(token)
@@ -996,7 +1067,7 @@ else:
         st.stop()
 
     user_id      = user.get("id", "")
-    top_artist_ids = [a["id"] for a in top_items["artists"][:5]]
+    top_artist_ids = [a["id"] for a in top_items["artists"][:5]] if top_items.get("artists") else []
 
     # ── Why AI? Sidebar (evaluator-facing) ───────────────────────────────────
     with st.sidebar:
@@ -1070,6 +1141,9 @@ else:
 
     # Profile
     _render_user_profile(user, top_items)
+
+    if is_demo:
+        st.info("ℹ️ Running in **Sandbox Demo Mode**. Spotify login is bypassed, but track recommendations are still fetched live from the Spotify Web API using Client Credentials.")
 
     st.markdown("<hr style='border-color:rgba(255,255,255,0.06);margin:1.5rem 0;'>", unsafe_allow_html=True)
 
