@@ -395,20 +395,32 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
     mood_summary = parsed.get("mood_summary", "")
     clean_mood = re.sub(r'[^\w\s]', '', mood_summary).strip()
     
-    # Generate search queries
+    # Split the mood description into individual keywords to make search queries flexible
+    # Filter out short/common stop words
+    stop_words = {"a", "an", "the", "in", "on", "at", "for", "to", "with", "by", "of", "and", "or"}
+    mood_words = [w for w in clean_mood.lower().split() if w not in stop_words and len(w) > 1]
+    
     queries = []
-    # 1. Combined genre + mood keyword queries (highest relevance)
+    
+    # 1. Broad text queries: genre + each mood keyword (e.g. "indie coffee", "acoustic morning")
     for g in genres:
-        if clean_mood:
-            queries.append(f"genre:{g} {clean_mood}")
-        else:
-            queries.append(f"genre:{g}")
+        for w in mood_words:
+            queries.append(f"{g} {w}")
             
-    # 2. General mood keyword query
+    # 2. Strict genre + mood keyword queries (e.g. "genre:indie coffee")
+    for g in genres:
+        for w in mood_words:
+            queries.append(f"genre:{g} {w}")
+            
+    # 3. Combined mood description (e.g. "sunday morning coffee")
     if clean_mood:
         queries.append(clean_mood)
         
-    # 3. Simple genre queries
+    # 4. Individual mood words alone
+    for w in mood_words:
+        queries.append(w)
+        
+    # 5. Just genres as filters (e.g. "genre:indie")
     for g in genres:
         queries.append(f"genre:{g}")
         
@@ -417,19 +429,33 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
     
     pool = {}
     
-    # Fetch tracks from each query
-    for q in queries[:5]: # limit to top 5 queries to avoid rate limits
+    # Fetch tracks from queries, stopping early once we have a healthy pool of 60+ tracks
+    for q in queries:
+        if len(pool) >= 60:
+            break
         try:
-            # We search for up to 30 tracks per query to build a diverse pool
-            results = sp.search(q=q, type="track", limit=30)
+            results = sp.search(q=q, type="track", limit=20)
             if results and "tracks" in results and "items" in results["tracks"]:
                 for track in results["tracks"]["items"]:
                     if track and "id" in track:
                         pool[track["id"]] = track
-        except Exception as e:
-            # Silently ignore search errors for individual queries
+        except Exception:
             pass
             
+    # Ultimate backup: query generic genres if the pool is still empty
+    if not pool:
+        for g in (genres + ["indie", "pop", "alternative", "chill"]):
+            if len(pool) >= 30:
+                break
+            try:
+                results = sp.search(q=f"genre:{g}", type="track", limit=20)
+                if results and "tracks" in results and "items" in results["tracks"]:
+                    for track in results["tracks"]["items"]:
+                        if track and "id" in track:
+                            pool[track["id"]] = track
+            except Exception:
+                pass
+                
     tracks_pool = list(pool.values())
     if not tracks_pool:
         return []
@@ -437,7 +463,7 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
     # Apply popularity filter matching the Discovery Dial (exploration_level 1-10)
     if exploration_level <= 3:
         # Familiar mode: target mainstream/known hits
-        filtered = [t for t in tracks_pool if 30 <= t.get("popularity", 50) <= 100]
+        filtered = [t for t in tracks_pool if 35 <= t.get("popularity", 50) <= 100]
         filtered.sort(key=lambda t: t.get("popularity", 50), reverse=True)
     elif exploration_level <= 6:
         # Balanced mode: mix of mainstream and indie
@@ -448,7 +474,7 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
         filtered = [t for t in tracks_pool if t.get("popularity", 50) <= 45]
         filtered.sort(key=lambda t: t.get("popularity", 50))
         
-    # Fallback to the whole pool if the filtering was too strict
+    # Fallback to the whole pool if the filtering was too strict and left us empty-handed
     if not filtered:
         filtered = tracks_pool
         random.shuffle(filtered)
