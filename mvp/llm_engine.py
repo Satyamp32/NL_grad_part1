@@ -281,7 +281,8 @@ def generate_track_explanations(mood_text: str, tracks: list,
 
     # Template fallback — references actual audio features for credibility
     def template_explanation(track: dict, mood_summary: str) -> str:
-        pop         = track.get("popularity", 50)
+        pop         = track.get("popularity")
+        pop         = pop if pop is not None else 50
         features    = parsed_mood.get("features", {})
         energy      = features.get("energy", 0.5)
         valence     = features.get("valence", 0.5)

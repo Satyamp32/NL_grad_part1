@@ -461,18 +461,22 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
         return []
         
     # Apply popularity filter matching the Discovery Dial (exploration_level 1-10)
+    def get_pop(t):
+        p = t.get("popularity")
+        return p if p is not None else 50
+
     if exploration_level <= 3:
         # Familiar mode: target mainstream/known hits
-        filtered = [t for t in tracks_pool if 35 <= t.get("popularity", 50) <= 100]
-        filtered.sort(key=lambda t: t.get("popularity", 50), reverse=True)
+        filtered = [t for t in tracks_pool if 35 <= get_pop(t) <= 100]
+        filtered.sort(key=get_pop, reverse=True)
     elif exploration_level <= 6:
         # Balanced mode: mix of mainstream and indie
-        filtered = [t for t in tracks_pool if 15 <= t.get("popularity", 50) <= 75]
+        filtered = [t for t in tracks_pool if 15 <= get_pop(t) <= 75]
         random.shuffle(filtered)
     else:
         # Explorer mode: underground deep cuts
-        filtered = [t for t in tracks_pool if t.get("popularity", 50) <= 45]
-        filtered.sort(key=lambda t: t.get("popularity", 50))
+        filtered = [t for t in tracks_pool if get_pop(t) <= 45]
+        filtered.sort(key=get_pop)
         
     # Fallback to the whole pool if the filtering was too strict and left us empty-handed
     if not filtered:
@@ -1012,7 +1016,7 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
 
     # Avg popularity proof
     if tracks:
-        avg_pop = int(sum(t.get("popularity", 50) for t in tracks) / len(tracks))
+        avg_pop = int(sum((t.get("popularity") if t.get("popularity") is not None else 50) for t in tracks) / len(tracks))
         pop_color = "#4ade80" if avg_pop < 50 else ("#fbbf24" if avg_pop < 70 else "#f87171")
         st.markdown(f"""
         <div style='background:rgba(29,185,84,0.06);border:1px solid rgba(29,185,84,0.15);
