@@ -481,9 +481,64 @@ def _build_recommendations_search_fallback(sp, parsed: dict, exploration_level: 
         
     return filtered[:15]
 
+def _build_recommendations_offline_fallback(parsed: dict, exploration_level: int) -> list:
+    """Calculate Euclidean distance between target audio features and mock track database."""
+    import math
+    import random
+    try:
+        from mock_data import MOCK_TRACKS
+    except ImportError:
+        return []
+
+    features = parsed.get("features", {})
+    target_valence = features.get("valence", 0.5)
+    target_energy = features.get("energy", 0.5)
+    target_danceability = features.get("danceability", 0.5)
+    target_acousticness = features.get("acousticness", 0.4)
+    target_instrumentalness = features.get("instrumentalness", 0.1)
+    
+    genres = [g.lower() for g in parsed.get("genres", [])]
+    
+    scored_tracks = []
+    
+    for track in MOCK_TRACKS:
+        dist = math.sqrt(
+            (track["valence"] - target_valence) ** 2 +
+            (track["energy"] - target_energy) ** 2 +
+            (track["danceability"] - target_danceability) ** 2 +
+            (track["acousticness"] - target_acousticness) ** 2 +
+            (track["instrumentalness"] - target_instrumentalness) ** 2
+        )
+        
+        # Calculate genre bonus (reduce distance if genres overlap)
+        genre_match = False
+        for g in track["genres"]:
+            if g in genres:
+                genre_match = True
+                break
+                
+        score = dist - (0.35 if genre_match else 0.0)
+        scored_tracks.append((score, track))
+        
+    scored_tracks.sort(key=lambda x: x[0])
+    candidates = [x[1] for x in scored_tracks]
+    
+    # Filter by popularity according to Discovery Dial
+    if exploration_level <= 3:
+        filtered = [t for t in candidates if t["popularity"] >= 70]
+    elif exploration_level <= 6:
+        filtered = [t for t in candidates if 60 <= t["popularity"] <= 82]
+    else:
+        filtered = [t for t in candidates if t["popularity"] <= 70]
+        
+    if len(filtered) < 5:
+        filtered = candidates
+        
+    return filtered[:15]
+
 def _build_recommendations(token: str, parsed: dict, exploration_level: int,
                             top_artist_ids: list) -> list:
-    """Call Spotify recommendations API with audio features from LLM, or fallback to Search API if blocked."""
+    """Call Spotify recommendations API, fallback to Search API, and then to offline mock database if all blocked."""
     sp = _get_sp(token)
     features = parsed["features"]
     genres   = parsed["genres"]
@@ -493,17 +548,14 @@ def _build_recommendations(token: str, parsed: dict, exploration_level: int,
     # - seed composition (familiar ↔ genre-only)
     # - popularity ceiling (mainstream ↔ underground)
     if expl <= 3:
-        # Familiar mode: seed from user's artists + 1 genre
         seed_artists = top_artist_ids[:2] if top_artist_ids else []
         seed_genres  = genres[:1] if genres else ["indie"]
         min_pop, max_pop = 30, 100
     elif expl <= 6:
-        # Balanced mode: mix
         seed_artists = top_artist_ids[:1] if top_artist_ids else []
         seed_genres  = genres[:2] if genres else ["indie", "pop"]
         min_pop, max_pop = 15, 75
     else:
-        # Explorer mode: genre-only seeds, underground tracks
         seed_artists = []
         seed_genres  = genres[:3] if genres else ["indie", "alternative", "folk"]
         min_pop, max_pop = 0, 45
@@ -522,12 +574,25 @@ def _build_recommendations(token: str, parsed: dict, exploration_level: int,
     if seed_artists:
         kwargs["seed_artists"] = seed_artists
 
+    # Try 1: Live Recommendations API
     try:
         result = sp.recommendations(**kwargs)
-        return result.get("tracks", [])
-    except Exception as e:
-        # Fall back to search-based discovery if restricted (404/403)
-        return _build_recommendations_search_fallback(sp, parsed, exploration_level)
+        tracks = result.get("tracks", [])
+        if tracks:
+            return tracks
+    except Exception:
+        pass
+
+    # Try 2: Live Search-based Fallback API
+    try:
+        tracks = _build_recommendations_search_fallback(sp, parsed, exploration_level)
+        if tracks:
+            return tracks
+    except Exception:
+        pass
+
+    # Try 3: Offline Mock Recommender (local vector search)
+    return _build_recommendations_offline_fallback(parsed, exploration_level)
 
 def _save_playlist(token: str, user_id: str, name: str,
                    track_uris: list, description: str = "") -> str:
