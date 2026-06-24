@@ -492,7 +492,10 @@ def _build_recommendations_offline_fallback(parsed: dict, exploration_level: int
     try:
         from mock_data import MOCK_TRACKS
     except ImportError:
-        return []
+        try:
+            from mvp.mock_data import MOCK_TRACKS
+        except ImportError:
+            return []
 
     features = parsed.get("features", {})
     target_valence = features.get("valence", 0.5)
@@ -849,7 +852,20 @@ def _render_user_profile(user: dict, top_items: dict):
         ]
         
     top_artists  = tracks[:3]
-    artist_names = [t["artists"][0]["name"] for t in tracks[:5]]
+    
+    # Safe artist names extraction
+    artist_names = []
+    for t in tracks[:5]:
+        artists_list = t.get("artists")
+        if artists_list and isinstance(artists_list, list):
+            first = artists_list[0]
+            if isinstance(first, dict):
+                artist_names.append(first.get("name", "Unknown Artist"))
+            else:
+                artist_names.append("Unknown Artist")
+        else:
+            artist_names.append("Unknown Artist")
+            
     top_genres   = []
     for a in artists[:5]:
         top_genres.extend(a.get("genres", [])[:2])
@@ -958,14 +974,38 @@ def _render_loading(mood_text: str, mode: str):
 def _render_track_card(track: dict, explanation: str, index: int):
     """Render a single track recommendation card."""
     name     = track.get("name", "Unknown Track")
-    artist   = track.get("artists", [{}])[0].get("name", "Unknown Artist")
-    album    = track.get("album", {}).get("name", "")
-    duration = track.get("duration_ms", 0) // 1000
+    
+    # Safe artists resolution
+    artists_list = track.get("artists")
+    artist = "Unknown Artist"
+    if artists_list and isinstance(artists_list, list):
+        first_artist = artists_list[0]
+        if isinstance(first_artist, dict):
+            artist = first_artist.get("name", "Unknown Artist")
+            
+    # Safe album resolution
+    album_obj = track.get("album")
+    album = ""
+    images = []
+    if album_obj and isinstance(album_obj, dict):
+        album = album_obj.get("name", "")
+        images = album_obj.get("images", [])
+        
+    duration = track.get("duration_ms")
+    duration = (duration // 1000) if duration is not None else 0
     mins, secs = divmod(duration, 60)
-    images   = track.get("album", {}).get("images", [])
-    img_url  = images[-1]["url"] if images else None
-    pop      = track.get("popularity", 0)
-    sp_url   = track.get("external_urls", {}).get("spotify", "#")
+    
+    img_url = None
+    if images and isinstance(images, list):
+        last_image = images[-1]
+        if isinstance(last_image, dict):
+            img_url = last_image.get("url")
+            
+    pop = track.get("popularity")
+    pop = pop if pop is not None else 50
+    
+    ext_urls = track.get("external_urls")
+    sp_url = ext_urls.get("spotify", "#") if ext_urls and isinstance(ext_urls, dict) else "#"
 
     col_img, col_info = st.columns([1, 6])
     with col_img:

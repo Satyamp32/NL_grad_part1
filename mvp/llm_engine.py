@@ -296,8 +296,16 @@ def generate_track_explanations(mood_text: str, tracks: list,
         return f"Fits your '{mood_summary}' — {e_w}, {t_w}, {x_w} texture. Popularity {pop}/100 — {d_note}."
 
     # Build track list for LLM
+    def get_track_artist(t):
+        artists = t.get("artists")
+        if artists and isinstance(artists, list):
+            first = artists[0]
+            if isinstance(first, dict):
+                return first.get("name", "Unknown Artist")
+        return "Unknown Artist"
+
     track_lines = "\n".join(
-        f"{i+1}. \"{t['name']}\" by {t['artists'][0]['name']}"
+        f"{i+1}. \"{t.get('name', 'Unknown Track')}\" by {get_track_artist(t)}"
         for i, t in enumerate(tracks[:10])
     )
     mood_summary = parsed_mood.get("mood_summary", mood_text[:60])
