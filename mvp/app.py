@@ -1000,20 +1000,21 @@ def _render_track_card(track: dict, explanation: str, index: int):
     sp_url = ext_urls.get("spotify", "#") if ext_urls and isinstance(ext_urls, dict) else "#"
 
     st.markdown(f"""
-    <div>
-        <div class='track-name'>
-            <a href='{sp_url}' target='_blank' style='color:#f1f5f9;text-decoration:none;'>
-                {index}. {name}
-            </a>
+    <div class='track-card'>
+        <div>
+            <div class='track-name'>
+                <a href='{sp_url}' target='_blank' style='color:#f1f5f9;text-decoration:none;'>
+                    {index}. {name}
+                </a>
+            </div>
+            <div class='track-artist'>{artist} · {album} · {mins}:{secs:02d}</div>
+            <div style='margin-top:0.15rem;'>
+                <span style='font-size:0.7rem;color:#334155;'>Popularity: {pop}/100</span>
+            </div>
+            <div class='track-explanation'>"{explanation}"</div>
         </div>
-        <div class='track-artist'>{artist} · {album} · {mins}:{secs:02d}</div>
-        <div style='margin-top:0.15rem;'>
-            <span style='font-size:0.7rem;color:#334155;'>Popularity: {pop}/100</span>
-        </div>
-        <div class='track-explanation'>"{explanation}"</div>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
 
 
 def _render_results(tracks: list, explanations: list, parsed_mood: dict,
@@ -1085,9 +1086,7 @@ def _render_results(tracks: list, explanations: list, parsed_mood: dict,
     # Track cards
     for i, (track, explanation) in enumerate(zip(tracks, explanations), 1):
         with st.container():
-            st.markdown("<div class='track-card'>", unsafe_allow_html=True)
             _render_track_card(track, explanation, i)
-            st.markdown("</div>", unsafe_allow_html=True)
 
     return [t["uri"] for t in tracks]
 
