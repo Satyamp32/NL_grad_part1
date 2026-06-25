@@ -275,6 +275,7 @@ SPOTIFY_REDIRECT_URI  = _secret("SPOTIFY_REDIRECT_URI", "http://localhost:8502/"
 LLM_PROVIDER          = _secret("LLM_PROVIDER", "openai").lower()
 OPENAI_API_KEY        = _secret("OPENAI_API_KEY")
 ANTHROPIC_API_KEY     = _secret("ANTHROPIC_API_KEY")
+GROQ_API_KEY          = _secret("GROQ_API_KEY")
 
 SPOTIFY_SCOPE = "user-top-read playlist-modify-public playlist-modify-private"
 _CREDENTIALS_READY = bool(SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET)
@@ -282,6 +283,7 @@ _CREDENTIALS_READY = bool(SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET)
 # ─── LLM client initialization ────────────────────────────────────────────────
 _openai_client = None
 _anthropic_client = None
+_groq_client = None
 
 if LLM_PROVIDER == "openai" and OPENAI_API_KEY:
     try:
@@ -294,6 +296,13 @@ if LLM_PROVIDER == "anthropic" and ANTHROPIC_API_KEY:
     try:
         import anthropic
         _anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    except Exception:
+        pass
+
+if LLM_PROVIDER == "groq" and GROQ_API_KEY:
+    try:
+        from groq import Groq
+        _groq_client = Groq(api_key=GROQ_API_KEY)
     except Exception:
         pass
 
@@ -1391,6 +1400,7 @@ else:
                         mood_text, exploration,
                         openai_client=_openai_client,
                         anthropic_client=_anthropic_client,
+                        groq_client=_groq_client,
                     )
                     _render_loading(mood_text, parsed.get("mode", "heuristic"))
 
@@ -1407,6 +1417,7 @@ else:
                             mood_text, tracks, parsed,
                             openai_client=_openai_client,
                             anthropic_client=_anthropic_client,
+                            groq_client=_groq_client,
                         )
 
                         # Cache result

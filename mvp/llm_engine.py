@@ -271,12 +271,69 @@ genres must be from: pop, indie, rock, hip-hop, r-n-b, jazz, classical, electron
     }
 
 
+def _llm_parse_groq(mood_text: str, exploration_level: int, client) -> dict:
+    """Parse mood using Groq LLaMA 3."""
+    prompt = f"""You are a music curation AI. A user described their mood as:
+"{mood_text}"
+Their exploration preference is {exploration_level}/10 (1=very familiar music, 10=maximum new discovery).
+
+Respond ONLY with a valid JSON object (no markdown, no explanation) with these exact keys:
+{{
+  "genres": ["genre1", "genre2"],
+  "valence": 0.55,
+  "energy": 0.60,
+  "danceability": 0.55,
+  "acousticness": 0.40,
+  "instrumentalness": 0.10,
+  "mood_summary": "short vibe phrase"
+}}
+
+Valid genres: pop, indie, rock, hip-hop, r-n-b, jazz, classical, electronic, dance, ambient, alternative, chill, folk, soul, blues, singer-songwriter, acoustic"""
+
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.4,
+        max_tokens=300,
+    )
+    raw = response.choices[0].message.content.strip()
+    if raw.startswith("```json"):
+        raw = raw[7:]
+    if raw.startswith("```"):
+        raw = raw[3:]
+    if raw.endswith("```"):
+        raw = raw[:-3]
+    raw = raw.strip()
+
+    data = json.loads(raw)
+    exploration_ratio = exploration_level / 10.0
+    return {
+        "features": {
+            "valence": float(data["valence"]),
+            "energy": float(data["energy"]),
+            "danceability": float(data["danceability"]),
+            "acousticness": float(data["acousticness"]),
+            "instrumentalness": float(data["instrumentalness"]),
+        },
+        "genres": data["genres"][:3],
+        "mood_summary": data.get("mood_summary", mood_text[:60]),
+        "mode": "groq",
+        "exploration_ratio": exploration_ratio,
+    }
+
+
 def parse_mood(mood_text: str, exploration_level: int = 5,
-               openai_client=None, anthropic_client=None) -> dict:
+               openai_client=None, anthropic_client=None, groq_client=None) -> dict:
     """
     Main entry point. Tries LLM first, falls back to heuristics.
     Returns a dict with: features, genres, mood_summary, mode, exploration_ratio
     """
+    if groq_client:
+        try:
+            return _llm_parse_groq(mood_text, exploration_level, groq_client)
+        except Exception as e:
+            logger.warning(f"Groq mood parse failed ({e}), falling back to heuristic")
+
     if openai_client:
         try:
             return _llm_parse_openai(mood_text, exploration_level, openai_client)
@@ -294,7 +351,7 @@ def parse_mood(mood_text: str, exploration_level: int = 5,
 
 def generate_track_explanations(mood_text: str, tracks: list,
                                  parsed_mood: dict,
-                                 openai_client=None, anthropic_client=None) -> list[str]:
+                                 openai_client=None, anthropic_client=None, groq_client=None) -> list[str]:
     """
     Generate a one-sentence explanation for each track explaining why it fits the mood.
     Falls back to template-based explanations.
@@ -342,6 +399,29 @@ Tracks:
 
 Respond ONLY as a JSON array of strings, one per track, same order:
 ["explanation 1", "explanation 2", ...]"""
+
+    if groq_client:
+        try:
+            response = groq_client.chat.completions.create(
+                model="llama3-70b-8192",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=600,
+            )
+            raw = response.choices[0].message.content.strip()
+            if raw.startswith("```json"):
+                raw = raw[7:]
+            if raw.startswith("```"):
+                raw = raw[3:]
+            if raw.endswith("```"):
+                raw = raw[:-3]
+            raw = raw.strip()
+            
+            explanations = json.loads(raw)
+            if isinstance(explanations, list) and len(explanations) >= len(tracks[:10]):
+                return explanations[:len(tracks)]
+        except Exception as e:
+            logger.warning(f"Groq explanation generation failed: {e}")
 
     if openai_client:
         try:
