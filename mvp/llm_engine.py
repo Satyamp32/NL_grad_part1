@@ -291,7 +291,7 @@ Respond ONLY with a valid JSON object (no markdown, no explanation) with these e
 Valid genres: pop, indie, rock, hip-hop, r-n-b, jazz, classical, electronic, dance, ambient, alternative, chill, folk, soul, blues, singer-songwriter, acoustic"""
 
     response = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
         max_tokens=300,
@@ -403,7 +403,7 @@ Respond ONLY as a JSON array of strings, one per track, same order:
     if groq_client:
         try:
             response = groq_client.chat.completions.create(
-                model="llama3-70b-8192",
+                model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
                 max_tokens=600,
