@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Growth Team — AI Discovery Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="presentation-container">
+        
+        <!-- SLIDE 1 -->
+        <section class="slide active" id="slide-1">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Spotify Growth Strategy</div>
+                <h1 class="slide-title">Spotify Has Solved Recommendation — The Next Challenge Is Meaningful Discovery</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <p class="hero-paragraph">Spotify has millions of songs and world-class recommendation systems. Yet users are trapped in a loop: replaying familiar playlists, listening to known artists, and struggling to find the right new music.</p>
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <span class="metric-num">100M+</span>
+                                <span class="metric-label">Tracks available</span>
+                            </div>
+                            <div class="metric-card">
+                                <span class="metric-num">3/5</span>
+                                <span class="metric-label">Repetition fatigue rating</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="split-right visual-container">
+                        <div class="loop-visual-container">
+                            <!-- SVG Loop animation -->
+                            <svg class="loop-svg" viewBox="0 0 400 400" width="340" height="340">
+                                <defs>
+                                    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#1DB954" stop-opacity="0.8"/>
+                                        <stop offset="100%" stop-color="#191414" stop-opacity="0.1"/>
+                                    </linearGradient>
+                                    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#1ed760" stop-opacity="1"/>
+                                        <stop offset="100%" stop-color="#4e34e1" stop-opacity="0.2"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Outer Repetitive Loop -->
+                                <circle cx="200" cy="200" r="150" fill="none" stroke="url(#greenGrad)" stroke-width="6" stroke-dasharray="10 5" class="spinning-loop-outer" />
+                                <circle cx="200" cy="200" r="120" fill="none" stroke="#222" stroke-width="4" />
+                                <!-- Inner AI Break out -->
+                                <circle cx="200" cy="200" r="80" fill="none" stroke="url(#glowGrad)" stroke-width="12" stroke-dasharray="40 180" class="spinning-loop-inner" />
+                                <!-- Vinyl Record Center -->
+                                <circle cx="200" cy="200" r="40" fill="#121212" stroke="#282828" stroke-width="2" />
+                                <circle cx="200" cy="200" r="10" fill="#1DB954" />
+                            </svg>
+                            <div class="loop-status-box">
+                                <span class="loop-pulse"></span>
+                                <span class="loop-text">Repetition Loop Detected</span>
+                            </div>
+                            <div class="ai-spark-icon">⚡</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>1 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2 -->
+        <section class="slide" id="slide-2">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">The Discovery Problem</div>
+                <h1 class="slide-title">Users Are Not Searching for More Songs — They Are Searching for the Right Feeling</h1>
+                <div class="caricatures-grid">
+                    
+                    <!-- Comfort Listener -->
+                    <div class="caricature-card">
+                        <div class="caricature-img-holder">
+                            <img src="assets/comfort_listener.png" alt="Comfort Listener" class="caricature-img">
+                            <div class="caricature-tag tag-purple">Risk Averse</div>
+                        </div>
+                        <h3 class="caricature-name">The Comfort Listener</h3>
+                        <p class="caricature-quote">"I keep playing the same playlist because discovery feels risky."</p>
+                        <ul class="caricature-details">
+                            <li>Replays favorite content to match mood baseline</li>
+                            <li>Avoids radio features due to high skip fatigue</li>
+                            <li>Values absolute predictability over novelty</li>
+                        </ul>
+                    </div>
+
+                    <!-- The Explorer -->
+                    <div class="caricature-card">
+                        <div class="caricature-img-holder">
+                            <img src="assets/explorer.png" alt="The Explorer" class="caricature-img">
+                            <div class="caricature-tag tag-green">Appetite Rich</div>
+                        </div>
+                        <h3 class="caricature-name">The Explorer</h3>
+                        <p class="caricature-quote">"I want new music but don't know where to start."</p>
+                        <ul class="caricature-details">
+                            <li>Overwhelmed by Spotify's massive 100M+ catalog</li>
+                            <li>Suffers from severe discovery choice paralysis</li>
+                            <li>Desires curated pathways, not open-ended search</li>
+                        </ul>
+                    </div>
+
+                    <!-- The Mood Listener -->
+                    <div class="caricature-card">
+                        <div class="caricature-img-holder">
+                            <img src="assets/mood_listener.png" alt="The Mood Listener" class="caricature-img">
+                            <div class="caricature-tag tag-blue">Context Heavy</div>
+                        </div>
+                        <h3 class="caricature-name">The Mood Listener</h3>
+                        <p class="caricature-quote">"I want music for my exact moment."</p>
+                        <ul class="caricature-details">
+                            <li>Wants tracks that match a highly specific vibe</li>
+                            <li>Struggles with rigid genre & keyword searches</li>
+                            <li>Values conversational, descriptive discovery prompts</li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>2 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3 -->
+        <section class="slide" id="slide-3">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Phase 1: Scale Analysis</div>
+                <h1 class="slide-title">AI Analysis of Millions of Conversations Revealed Hidden Discovery Frictions</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <p class="body-text large">To map user pain points at scale, we deployed an AI review engine that continuously crawls and categorizes app reviews, community discussions, and social comments.</p>
+                        <div class="insight-box highlight-border">
+                            <h3>Key AI Engine Insight</h3>
+                            <p>Collaborative filtering is creating local optima. Users get trapped in hyper-focused recommendation clusters that feel repetitive, predictable, and artificial.</p>
+                        </div>
+                        <div class="button-wrapper">
+                            <a href="https://nlspotify-discovery-engine.streamlit.app/" target="_blank" class="prototype-btn">
+                                <span>Try Deployed Discovery Engine Prototype</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="split-right visual-container">
+                        <!-- Architecture Diagram -->
+                        <div class="architecture-diagram">
+                            <div class="arch-column">
+                                <div class="arch-title">Data Sources</div>
+                                <div class="arch-card source-card">
+                                    <span class="card-icon">📱</span>
+                                    <span>App & Play Store Reviews</span>
+                                </div>
+                                <div class="arch-card source-card">
+                                    <span class="card-icon">💬</span>
+                                    <span>Reddit & Forums</span>
+                                </div>
+                                <div class="arch-card source-card">
+                                    <span class="card-icon">👥</span>
+                                    <span>Community Discussions</span>
+                                </div>
+                            </div>
+                            <div class="arch-arrow-col">
+                                <div class="arch-arrow">➔</div>
+                                <div class="arch-arrow">➔</div>
+                                <div class="arch-arrow">➔</div>
+                            </div>
+                            <div class="arch-column">
+                                <div class="arch-title">AI Processing</div>
+                                <div class="arch-card processing-card">
+                                    <span class="processing-pulse"></span>
+                                    <span>Sentiment Analysis</span>
+                                </div>
+                                <div class="arch-card processing-card">
+                                    <span class="processing-pulse"></span>
+                                    <span>Topic Clustering</span>
+                                </div>
+                                <div class="arch-card processing-card">
+                                    <span class="processing-pulse"></span>
+                                    <span>Insight Extraction</span>
+                                </div>
+                            </div>
+                            <div class="arch-arrow-col2">
+                                <div class="arch-arrow">➔</div>
+                            </div>
+                            <div class="arch-column final-col">
+                                <div class="arch-title">Product Focus</div>
+                                <div class="arch-card opportunity-card">
+                                    <span class="card-badge">MVP</span>
+                                    <strong>Conversational Intent Engine</strong>
+                                    <span class="opp-desc">Solving mood & repetitiveness issues</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>3 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4 -->
+        <section class="slide" id="slide-4">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Phase 2: Survey Insights</div>
+                <h1 class="slide-title">User Research Confirmed Recommendation Fatigue Is Real</h1>
+                <div class="charts-layout">
+                    
+                    <!-- Chart 1: Donut for repetition frequency -->
+                    <div class="chart-container-card">
+                        <h3>Perceived Recommendation Repetition</h3>
+                        <div class="donut-chart-wrapper">
+                            <svg class="donut-svg" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="45" class="donut-bg"/>
+                                <circle cx="60" cy="60" r="45" class="donut-segment" stroke-dasharray="251 282" stroke-dashoffset="0"/>
+                            </svg>
+                            <div class="donut-center-text">
+                                <span class="donut-big-num">89%</span>
+                                <span class="donut-sub-text">Moderate / High Repetition</span>
+                            </div>
+                        </div>
+                        <p class="chart-note">89% of respondents who answered rated repetition at <strong>3/5</strong> or higher.</p>
+                    </div>
+
+                    <!-- Chart 2: Discovery Challenges -->
+                    <div class="chart-container-card">
+                        <h3>Primary Discovery Roadblocks</h3>
+                        <div class="bar-chart-wrapper">
+                            <div class="bar-row">
+                                <span class="bar-label">Repetitive Content</span>
+                                <div class="bar-track"><div class="bar-fill" style="width: 30%"></div></div>
+                                <span class="bar-val">30%</span>
+                            </div>
+                            <div class="bar-row">
+                                <span class="bar-label">Too Mainstream</span>
+                                <div class="bar-track"><div class="bar-fill" style="width: 20%"></div></div>
+                                <span class="bar-val">20%</span>
+                            </div>
+                            <div class="bar-row">
+                                <span class="bar-label">Choice Paralysis</span>
+                                <div class="bar-track"><div class="bar-fill" style="width: 30%"></div></div>
+                                <span class="bar-val">30%</span>
+                            </div>
+                            <div class="bar-row">
+                                <span class="bar-label">Vibe / Mood Matching</span>
+                                <div class="bar-track"><div class="bar-fill" style="width: 10%"></div></div>
+                                <span class="bar-val">10%</span>
+                            </div>
+                        </div>
+                        <p class="chart-note">Users suffer from three equally painful, systemic issues.</p>
+                    </div>
+
+                    <!-- Chart 3: Feature validation progress bars -->
+                    <div class="chart-container-card">
+                        <h3>AI Feature Validation Strength</h3>
+                        <div class="feature-ranks">
+                            <div class="rank-item">
+                                <div class="rank-hdr">
+                                    <span class="rank-num">#1</span>
+                                    <span class="rank-name">Mood-Based Discovery</span>
+                                    <span class="rank-pct">90% Useful</span>
+                                </div>
+                                <div class="rank-track">
+                                    <div class="rank-fill-very" style="width: 50%"></div>
+                                    <div class="rank-fill-somewhat" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-hdr">
+                                    <span class="rank-num">#2</span>
+                                    <span class="rank-name">Discovery Slider</span>
+                                    <span class="rank-pct">80% Useful</span>
+                                </div>
+                                <div class="rank-track">
+                                    <div class="rank-fill-very" style="width: 40%"></div>
+                                    <div class="rank-fill-somewhat" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-hdr">
+                                    <span class="rank-num">#3</span>
+                                    <span class="rank-name">AI Playlist Chat</span>
+                                    <span class="rank-pct">80% Useful</span>
+                                </div>
+                                <div class="rank-track">
+                                    <div class="rank-fill-very" style="width: 30%"></div>
+                                    <div class="rank-fill-somewhat" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rank-legend">
+                            <span class="legend-dot very"></span> Very Useful
+                            <span class="legend-dot somewhat"></span> Somewhat Useful
+                        </div>
+                    </div>
+
+                </div>
+                <div class="highlight-quote-card">
+                    <p>"Users want active discovery guidance, not another static playlist."</p>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>4 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5 -->
+        <section class="slide" id="slide-5">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Problem Definition</div>
+                <h1 class="slide-title">Survey Insights Show a Gap Between Spotify Intelligence and User Intent</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <div class="gap-card font-red">
+                            <h3>What Spotify ML Mastered</h3>
+                            <ul class="gap-list">
+                                <li><strong>Listening History:</strong> Detailed logging of every track, skip, and duration.</li>
+                                <li><strong>Behavioral Vectors:</strong> High-dimensional embeddings mapping artist affinities.</li>
+                                <li><strong>Collaborative Similarity:</strong> Grouping users with matching historical profiles.</li>
+                            </ul>
+                        </div>
+                        <div class="gap-arrow">➔</div>
+                        <div class="gap-card font-green">
+                            <h3>What Current ML Fails to Grasp</h3>
+                            <ul class="gap-list">
+                                <li><strong>Immediate Context:</strong> Why a user's intent changed from their history.</li>
+                                <li><strong>Emotional State:</strong> The nuanced feeling they want to capture *now*.</li>
+                                <li><strong>Conversational Steerability:</strong> Explaining *why* they want something different.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="split-right visual-container">
+                        <div class="ml-vs-ai-visual">
+                            <div class="brain-concept-container">
+                                <div class="brain-card left-brain">
+                                    <div class="brain-title">Traditional ML Brain</div>
+                                    <div class="network-dots">
+                                        <!-- Animated nodes in CSS -->
+                                        <div class="dot active"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot active"></div>
+                                        <div class="dot"></div>
+                                        <div class="line"></div>
+                                        <div class="line l2"></div>
+                                    </div>
+                                    <span class="brain-tag">Locked Grid</span>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="brain-card right-brain">
+                                    <div class="brain-title">Conversational AI</div>
+                                    <div class="animated-waveforms">
+                                        <!-- Continuous dynamic CSS waveform bar chart -->
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                    </div>
+                                    <span class="brain-tag">Dynamic Intent</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>5 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6 -->
+        <section class="slide" id="slide-6">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Strategic Framing</div>
+                <h1 class="slide-title">The Opportunity: Move From Predicting Taste To Understanding Intent</h1>
+                <div class="problem-framing-box">
+                    <div class="pf-header">THE PROBLEM STATEMENT</div>
+                    <div class="pf-body">
+                        "For Spotify users who want to discover new music, our current recommendation systems fail when users have a specific, context-dependent discovery goal. The root cause is a limited understanding of conversational intent, driving users to rely on manual curations or replay familiar lists."
+                    </div>
+                </div>
+                
+                <h2 class="section-sub-title">Business Growth Opportunities</h2>
+                <div class="opportunities-grid">
+                    <div class="opp-card">
+                        <div class="opp-icon">🚀</div>
+                        <h4>Increase Engagement</h4>
+                        <p>Unlock new active listening sessions by providing steerable, rewarding discovery interfaces.</p>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-icon">🛡️</div>
+                        <h4>Reduce User Churn</h4>
+                        <p>Address the "chronic repetition fatigue" (3/5 score) before users explore alternative platforms.</p>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-icon">🎵</div>
+                        <h4>Long-tail Artist Discovery</h4>
+                        <p>Shift consumption away from over-represented mainstream hits by accurately mapping niche artist intent.</p>
+                    </div>
+                    <div class="opp-card">
+                        <div class="opp-icon">💾</div>
+                        <h4>Boost Save Rates</h4>
+                        <p>Steerable discovery matching exact context increases tracks added to personal libraries.</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>6 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7 -->
+        <section class="slide" id="slide-7">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">System Design</div>
+                <h1 class="slide-title">AI Unlocks a New Discovery Experience Impossible With Traditional Systems</h1>
+                <div class="table-container">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Traditional Recommendation</th>
+                                <th class="highlight-col-header">AI-Native Discovery Engine</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="dim-label">Input Core</td>
+                                <td>Implicit past behavior (skips, track durations, play counts)</td>
+                                <td class="highlight-col">Explicit natural language intent + situational context</td>
+                            </tr>
+                            <tr>
+                                <td class="dim-label">System Architecture</td>
+                                <td>Collaborative Filtering & Matrix Factorization</td>
+                                <td class="highlight-col">Large Language Model (LLM) + Vector RAG Retrieval</td>
+                            </tr>
+                            <tr>
+                                <td class="dim-label">Exploration Control</td>
+                                <td>None (locked system profile defaults)</td>
+                                <td class="highlight-col">Steerable Discovery Slider (Familiar ↔ Wildly Explorer)</td>
+                            </tr>
+                            <tr>
+                                <td class="dim-label">Transparency Layer</td>
+                                <td>Black-box recommendations</td>
+                                <td class="highlight-col">Clear, conversational explanations of *why* each song fits</td>
+                            </tr>
+                            <tr>
+                                <td class="dim-label">Feedback Latency</td>
+                                <td>High (requires days of skips to update matrix profiles)</td>
+                                <td class="highlight-col">Instantaneous (conversational correction & slider steering)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>7 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8 -->
+        <section class="slide" id="slide-8">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Phase 4 MVP Prototype</div>
+                <h1 class="slide-title">AI Discovery Companion Turns a Music Search Into a Conversation</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <p class="body-text large">We built and deployed a functional MVP demonstrating how conversational AI can guide discovery based on context rather than catalog history.</p>
+                        
+                        <div class="bullet-list-container">
+                            <div class="bullet-item">
+                                <span class="bullet-dot"></span>
+                                <div>
+                                    <strong>Natural Language Steering:</strong>
+                                    Users describe their exact mood, environment, or prompt.
+                                </div>
+                            </div>
+                            <div class="bullet-item">
+                                <span class="bullet-dot"></span>
+                                <div>
+                                    <strong>Steerable Exploration:</strong>
+                                    Discovery Slider modulates recommendations between familiar hits and niche gems.
+                                </div>
+                            </div>
+                            <div class="bullet-item">
+                                <span class="bullet-dot"></span>
+                                <div>
+                                    <strong>Explainable Curation:</strong>
+                                    AI explicitly details *why* a track matches the conversational prompt.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="button-wrapper">
+                            <a href="https://nl-ainative-mvp.streamlit.app/" target="_blank" class="prototype-btn">
+                                <span>Try Deployed Streamlit MVP</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="split-right visual-container">
+                        <!-- Spotify App Mockup -->
+                        <div class="spotify-mockup">
+                            <div class="mockup-header">
+                                <span class="mock-back">←</span>
+                                <span class="mock-title">AI Discovery Companion</span>
+                                <span class="mock-menu">•••</span>
+                            </div>
+                            <div class="mockup-chat-body">
+                                <div class="chat-msg user-msg">
+                                    <p>"Give me songs for a late night peaceful drive"</p>
+                                </div>
+                                <div class="chat-msg ai-msg">
+                                    <div class="ai-avatar">🟢</div>
+                                    <div class="ai-text-bubble">
+                                        <p>I've generated a moody, late-night driving queue for you. Here is the first track:</p>
+                                        <div class="music-card-mock">
+                                            <div class="music-art"></div>
+                                            <div class="music-info">
+                                                <span class="music-title">Nightcall</span>
+                                                <span class="music-artist">Kavinsky • OutRun</span>
+                                            </div>
+                                            <div class="music-play">▶</div>
+                                        </div>
+                                        <p class="explanation-box"><strong>Why this fits:</strong> Its slow 80s retro-synth pulse matches a highway rhythm, while the vocoder vocals maintain a calm, hypnotic late-night atmosphere.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mockup-control-footer">
+                                <div class="slider-container">
+                                    <div class="slider-labels">
+                                        <span>Familiar Hits</span>
+                                        <span>Discovery Explorer</span>
+                                    </div>
+                                    <div class="slider-bar">
+                                        <div class="slider-fill" style="width: 75%"></div>
+                                        <div class="slider-handle" style="left: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="input-row-mock">
+                                    <div class="mock-input-text">Explain why this track is next...</div>
+                                    <div class="mock-send-btn">➔</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>8 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9 -->
+        <section class="slide" id="slide-9">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Growth Mechanics</div>
+                <h1 class="slide-title">The MVP Creates a New Spotify Growth Loop</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <p class="hero-paragraph">By letting users steer recommendations explicitly, we build trust, increase catalog exposure, and capture more explicit state indicators.</p>
+                        <div class="loop-explanation">
+                            <div class="loop-explanation-card">
+                                <h4>Traditional Passive Loop (Stagnant)</h4>
+                                <p>Passive play ➔ System repeats catalog based on history ➔ Safe but predictable behavior ➔ Interest stagnation.</p>
+                            </div>
+                            <div class="loop-explanation-card highlight-border">
+                                <h4>AI-Native Discovery Loop (Growth)</h4>
+                                <p>User defines prompt & slider ➔ AI exposes niche long-tail artists ➔ Accurate fit drives library saves ➔ Better taste graph models.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="split-right visual-container">
+                        <!-- Growth Loop diagram -->
+                        <div class="growth-loop-diagram">
+                            <svg viewBox="0 0 400 400" width="360" height="360" class="growth-loop-svg">
+                                <defs>
+                                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1ed760"/>
+                                    </marker>
+                                </defs>
+                                
+                                <!-- Center core -->
+                                <circle cx="200" cy="200" r="45" fill="#121212" stroke="#1ed760" stroke-width="2"/>
+                                <text x="200" y="205" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">GROWTH</text>
+                                
+                                <!-- Nodes -->
+                                <!-- 1. User Intent -->
+                                <g class="loop-node" transform="translate(200, 50)">
+                                    <rect x="-60" y="-20" width="120" height="40" rx="10" fill="#282828" stroke="#555"/>
+                                    <text x="0" y="5" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">User Intent Prompt</text>
+                                </g>
+                                
+                                <!-- 2. AI Understanding -->
+                                <g class="loop-node" transform="translate(330, 140)">
+                                    <rect x="-60" y="-20" width="120" height="40" rx="10" fill="#282828" stroke="#555"/>
+                                    <text x="0" y="5" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">AI Context Engine</text>
+                                </g>
+
+                                <!-- 3. Better Discovery -->
+                                <g class="loop-node" transform="translate(290, 290)">
+                                    <rect x="-60" y="-20" width="120" height="40" rx="10" fill="#1ed760" stroke="#1ed760"/>
+                                    <text x="0" y="5" text-anchor="middle" fill="#121212" font-size="12" font-weight="bold">Niche Discovery</text>
+                                </g>
+
+                                <!-- 4. More Saves -->
+                                <g class="loop-node" transform="translate(110, 290)">
+                                    <rect x="-60" y="-20" width="120" height="40" rx="10" fill="#282828" stroke="#555"/>
+                                    <text x="0" y="5" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">More Library Saves</text>
+                                </g>
+
+                                <!-- 5. Better Taste Graph -->
+                                <g class="loop-node" transform="translate(70, 140)">
+                                    <rect x="-60" y="-20" width="120" height="40" rx="10" fill="#282828" stroke="#555"/>
+                                    <text x="0" y="5" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Enriched Taste Graph</text>
+                                </g>
+
+                                <!-- Connecting curves with markers -->
+                                <!-- 1 -> 2 -->
+                                <path d="M 240,65 Q 310,90 320,120" fill="none" stroke="#1ed760" stroke-width="2" marker-end="url(#arrow)"/>
+                                <!-- 2 -> 3 -->
+                                <path d="M 330,160 Q 330,230 300,270" fill="none" stroke="#1ed760" stroke-width="2" marker-end="url(#arrow)"/>
+                                <!-- 3 -> 4 -->
+                                <path d="M 230,300 Q 180,310 170,300" fill="none" stroke="#1ed760" stroke-width="2" marker-end="url(#arrow)"/>
+                                <!-- 4 -> 5 -->
+                                <path d="M 90,270 Q 70,230 70,160" fill="none" stroke="#1ed760" stroke-width="2" marker-end="url(#arrow)"/>
+                                <!-- 5 -> 1 -->
+                                <path d="M 90,120 Q 110,75 140,65" fill="none" stroke="#1ed760" stroke-width="2" marker-end="url(#arrow)"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="loop-callout">
+                    <p>AI shifts Spotify from: <span>"Spotify predicts what you like"</span> to <span>"Spotify understands what you are looking for."</span></p>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>9 / 10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10 -->
+        <section class="slide" id="slide-10">
+            <div class="slide-background"></div>
+            <div class="slide-content">
+                <div class="tag">Leadership Summary</div>
+                <h1 class="slide-title">AI-Powered Discovery Can Become Spotify's Next Engagement Engine</h1>
+                <div class="slide-layout-split">
+                    <div class="split-left">
+                        <div class="impact-summary-container">
+                            <div class="impact-col">
+                                <h3>Impact for Listeners</h3>
+                                <ul class="impact-bullets">
+                                    <li>🎵 <strong>Meaningful Discovery:</strong> Effortless transition to new genres.</li>
+                                    <li>🧠 <strong>Emotional Curation:</strong> Deep feeling of being understood by the app.</li>
+                                    <li>❌ <strong>Break Repetition Loop:</strong> Instant escape pathway from catalog staleness.</li>
+                                </ul>
+                            </div>
+                            <div class="impact-col">
+                                <h3>Impact for Spotify</h3>
+                                <ul class="impact-bullets">
+                                    <li>📈 <strong>Higher Engagement:</strong> Longer session counts and deeper sessions.</li>
+                                    <li>🛡️ <strong>Improved Retention:</strong> Reduces churn by solving recommendation fatigue.</li>
+                                    <li>🌱 <strong>Artist Ecosystem:</strong> Distributes organic plays across a broader library.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-horizontal">
+                            <div class="rm-title">Future Product Roadmap</div>
+                            <div class="rm-steps">
+                                <div class="rm-step">
+                                    <span class="step-badge">Phase 1 (Completed)</span>
+                                    <span>AI Discovery Engine</span>
+                                </div>
+                                <div class="rm-step">
+                                    <span class="step-badge">Phase 2 (Completed)</span>
+                                    <span>Primary Research</span>
+                                </div>
+                                <div class="rm-step active-step">
+                                    <span class="step-badge">Phase 4 (Live)</span>
+                                    <span>Discovery MVP</span>
+                                </div>
+                                <div class="rm-step">
+                                    <span class="step-badge">Phase 5 (Roadmap)</span>
+                                    <span>Real-Time Biometric Mood</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="split-right visual-container">
+                        <div class="project-final-card">
+                            <h3>Deployed Decks & Prototypes</h3>
+                            <div class="links-list">
+                                <a href="https://nlspotify-discovery-engine.streamlit.app/" target="_blank" class="final-link-row">
+                                    <span class="link-label">Review Intelligence Engine</span>
+                                    <span class="link-icon">➔</span>
+                                </a>
+                                <a href="https://nl-ainative-mvp.streamlit.app/" target="_blank" class="final-link-row">
+                                    <span class="link-label">AI Discovery Companion MVP</span>
+                                    <span class="link-icon">➔</span>
+                                </a>
+                            </div>
+                            
+                            <div class="waveforms-container-small">
+                                <div class="animated-waveforms wave-small">
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>Executive Strategy Presentation</span>
+                    <span>10 / 10</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Live Presentation Navigation Controls -->
+    <div id="controls-bar" class="no-print">
+        <button id="prev-btn" class="nav-btn">◀ Prev</button>
+        <span id="slide-indicator">Slide 1 / 10</span>
+        <button id="next-btn" class="nav-btn">Next ▶</button>
+        <button id="print-mode-btn" class="nav-btn accent-btn">Toggle Slide Stack for Print</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
