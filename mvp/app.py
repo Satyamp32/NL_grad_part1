@@ -1367,15 +1367,6 @@ else:
         st.markdown("<br>", unsafe_allow_html=True)
         generate_clicked = st.button("🎵  Generate My Discovery Playlist", key="generate_btn")
 
-        if not _openai_client and not _anthropic_client:
-            st.markdown("""
-            <div style='margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(251,191,36,0.06);
-                        border:1px solid rgba(251,191,36,0.2);border-radius:8px;
-                        font-size:0.82rem;color:#92400e;'>
-                ⚡ Running in <b>heuristic mode</b> — add an LLM API key in <code>.env</code> for smarter results.
-            </div>
-            """, unsafe_allow_html=True)
-
     with col_results:
         # ── Research Finding → MVP Connection ───────────────────────────────
         st.markdown("""
